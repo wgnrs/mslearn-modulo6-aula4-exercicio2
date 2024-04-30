@@ -7,17 +7,7 @@
 
 string overallStatusMessage = "";
 
-try
-{
-    Workflow1(userEnteredValues);
-    Console.WriteLine("'Workflow1' completed successfully.");
-
-}
-catch (DivideByZeroException ex)
-{
-    Console.WriteLine("An error occurred during 'Workflow1'.");
-    Console.WriteLine(ex.Message);
-}
+overallStatusMessage = Workflow1(userEnteredValues);
 
 if (overallStatusMessage == "operating procedure complete")
 {
@@ -29,45 +19,41 @@ else
     Console.WriteLine(overallStatusMessage);
 }
 
-static void Workflow1(string[][] userEnteredValues)
+static string Workflow1(string[][] userEnteredValues)
 {
     string operationStatusMessage = "good";
-    // string processStatusMessage = "";
+    string processStatusMessage = "";
 
-    try
+    foreach (string[] userEntries in userEnteredValues)
     {
-        foreach (string[] userEntries in userEnteredValues)
+        processStatusMessage = Process1(userEntries);
+
+        if (processStatusMessage == "process complete")
         {
-
-            try
-            {
-                Process1(userEntries);
-                Console.WriteLine("'Process1' completed successfully.");
-                Console.WriteLine();
-            }
-            catch (DivideByZeroException ex)
-            {
-                Console.WriteLine("'Process1' encountered an issue, process aborted.");
-                Console.WriteLine(ex.Message);
-                Console.WriteLine();
-
-            }
+            Console.WriteLine("'Process1' completed successfully.");
+            Console.WriteLine();
         }
-
-        if (operationStatusMessage == "good")
+        else
         {
-            operationStatusMessage = "operating procedure complete";
+            Console.WriteLine("'Process1' encountered an issue, process aborted.");
+            Console.WriteLine(processStatusMessage);
+            Console.WriteLine();
+            operationStatusMessage = processStatusMessage;
         }
     }
-    catch (FormatException ex)
+
+    if (operationStatusMessage == "good")
     {
-        System.Console.WriteLine("An error occurred during 'Workflow1'.");
-        System.Console.WriteLine(ex.Message);
+        operationStatusMessage = "operating procedure complete";
     }
+
+    return operationStatusMessage;
 }
 
-static void Process1(String[] userEntries)
+static string Process1(String[] userEntries)
 {
+    string processStatus = "clean";
+    string returnMessage = "";
     int valueEntered;
 
     foreach (string userValue in userEntries)
@@ -85,18 +71,21 @@ static void Process1(String[] userEntries)
             }
             else
             {
-                throw new DivideByZeroException("Invalid data. User input values must be non-zero values.");
+                returnMessage = "Invalid data. User input values must be non-zero values.";
+                processStatus = "error";
             }
         }
         else
         {
-            throw new FormatException("Invalid data. User input values must be valid integers.");
+            returnMessage = "Invalid data. User input values must be valid integers.";
+            processStatus = "error";
         }
     }
-}
 
-// Todos os métodos precisam ser convertidos de métodos static string em métodos static void.
-// O método Process1 precisa gerar exceções para cada tipo de problema encontrado.
-// O método Workflow1 precisa capturar e tratar as exceções FormatException.
-// As instruções de nível superior precisam capturar e tratar as exceções DivideByZeroException.
-// A propriedade Message da exceção precisa ser usada para notificar o usuário sobre o problema.
+    if (processStatus == "clean")
+    {
+        returnMessage = "process complete";
+    }
+
+    return returnMessage;
+}
